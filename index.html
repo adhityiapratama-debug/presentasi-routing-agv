@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Routing AGV Smart Factory</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07111f;--surface:#0d1f35;--surface2:#123456;--accent:#00e5ff;--green:#39ff6a;--orange:#ff8a00;--red:#ff4d6d;--text:#eaf6ff;--muted:#7fa6bd;--border:rgba(0,229,255,.16);--glow:0 0 22px rgba(0,229,255,.28)}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Sora,sans-serif;background:radial-gradient(circle at 85% 20%,rgba(0,229,255,.1),transparent 28%),radial-gradient(circle at 10% 80%,rgba(57,255,106,.07),transparent 26%),var(--bg);color:var(--text)}
+nav{position:fixed;top:0;left:0;right:0;z-index:10;display:flex;justify-content:space-between;gap:14px;align-items:center;padding:14px 28px;background:rgba(7,17,31,.9);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+.logo{font-family:"Space Mono",monospace;color:var(--accent);letter-spacing:2px;font-size:12px}.links{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.btn{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:1px;color:var(--muted);background:transparent;border:1px solid var(--border);border-radius:5px;padding:6px 10px;cursor:pointer}.btn:hover,.btn.active{color:var(--accent);border-color:var(--accent);box-shadow:var(--glow);background:rgba(0,229,255,.08)}
+section{display:none;min-height:100vh;max-width:1120px;margin:0 auto;padding:100px 32px 60px}section.active{display:block;animation:fade .35s ease}@keyframes fade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+#home{display:flex!important;flex-direction:column;justify-content:center;max-width:100%;padding:0 10vw;position:relative;overflow:hidden}.gridbg{position:absolute;inset:0;background-image:linear-gradient(rgba(0,229,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.04) 1px,transparent 1px);background-size:52px 52px}.tag{width:max-content;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:3px;color:var(--green);border:1px solid rgba(57,255,106,.3);padding:6px 14px;margin-bottom:24px;position:relative;z-index:1}h1{font-size:clamp(2.3rem,5vw,4.6rem);line-height:1.05;max-width:850px;font-weight:800;position:relative;z-index:1}h1 span,h2 em{color:var(--accent);font-style:normal;text-shadow:var(--glow)}.sub{color:var(--muted);line-height:1.8;max-width:650px;margin-top:20px;position:relative;z-index:1}.stats{display:flex;gap:34px;flex-wrap:wrap;margin-top:46px;position:relative;z-index:1}.stat{display:flex;flex-direction:column}.num{font-family:"Space Mono",monospace;font-size:2rem;color:var(--accent);font-weight:700}.lab{font-size:.74rem;color:var(--muted);letter-spacing:1px}.sec{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:3px;color:var(--accent);margin-bottom:8px}h2{font-size:clamp(1.65rem,3vw,2.5rem);margin-bottom:28px}h3{color:var(--accent);font-size:1.08rem;margin-bottom:10px}.lead,.card p{color:var(--muted);line-height:1.75;font-size:.92rem}.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:18px}.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px}.card{background:linear-gradient(180deg,rgba(18,52,86,.65),rgba(13,31,53,.85));border:1px solid var(--border);border-radius:14px;padding:24px;transition:.2s}.card-link{display:block;text-decoration:none;color:inherit}.card-link:hover{color:inherit}.card-link .card{cursor:pointer}.card:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:var(--glow)}.icon{font-size:2rem;margin-bottom:14px}.badge{display:inline-block;font-family:"Space Mono",monospace;font-size:10px;padding:3px 8px;border-radius:3px;letter-spacing:1px;border:1px solid rgba(0,229,255,.28);color:var(--accent);background:rgba(0,229,255,.08)}.green{color:var(--green);border-color:rgba(57,255,106,.3);background:rgba(57,255,106,.08)}.orange{color:var(--orange);border-color:rgba(255,138,0,.3);background:rgba(255,138,0,.08)}.red{color:var(--red);border-color:rgba(255,77,109,.3);background:rgba(255,77,109,.08)}
+.flow{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;margin:28px 0 34px}.box{min-width:130px;text-align:center;padding:15px 18px;background:var(--surface2);border:1px solid var(--border);border-radius:9px;font-size:.84rem}.box.hl{border-color:var(--green);box-shadow:0 0 22px rgba(57,255,106,.25)}.arrow{color:var(--accent);font-size:1.45rem;padding:0 10px}
+.table{overflow-x:auto;border:1px solid var(--border);border-radius:12px;background:var(--surface)}table{width:100%;border-collapse:collapse;min-width:760px}th,td{padding:14px 16px;border-bottom:1px solid rgba(0,229,255,.09);text-align:left;font-size:.85rem}th{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:1px;color:var(--accent);background:rgba(0,229,255,.04)}td{color:#cbe6f6}tr:last-child td{border-bottom:0}
+.graph{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:18px}.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:14px 18px;border-bottom:1px solid var(--border)}.sim{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:7px 12px;cursor:pointer}.sim.active{color:var(--green);border-color:var(--green);box-shadow:0 0 22px rgba(57,255,106,.25)}#canvas{width:100%;display:block}#info{padding:13px 18px;font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);border-top:1px solid var(--border);min-height:40px}
+pre{background:#050b16;border:1px solid var(--border);border-radius:10px;padding:20px;overflow-x:auto;font-family:"Space Mono",monospace;font-size:.78rem;line-height:1.8;color:#a8d8ea}.kw{color:#ff6b9d}.str{color:var(--green)}.cm{color:#4a6a7c}.n{color:#ffd93d}
+.res{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:22px}.rescard{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:18px}.resnum{font-family:"Space Mono",monospace;font-size:2.1rem;font-weight:700;color:var(--green)}@media(max-width:720px){nav{flex-direction:column;align-items:flex-start}section{padding:130px 16px 48px}.flow{flex-direction:column}.arrow{transform:rotate(90deg);padding:8px}}
+
+.graph-image-card{
+  margin-top:22px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:18px;
+  box-shadow:0 0 18px rgba(0,229,255,.10);
+}
+.graph-image-card img{
+  width:100%;
+  display:block;
+  border-radius:10px;
+  background:white;
+}
+.graph-caption{
+  color:var(--muted);
+  font-size:.82rem;
+  line-height:1.6;
+  margin-top:12px;
+  text-align:center;
+}
+
+
+.home-info-panel{
+  position:absolute;
+  right:7vw;
+  top:50%;
+  transform:translateY(-42%);
+  width:min(460px,34vw);
+  display:grid;
+  gap:14px;
+  z-index:2;
+}
+.info-mini-card{
+  background:rgba(13,31,53,.72);
+  border:1px solid rgba(0,229,255,.18);
+  border-radius:14px;
+  padding:18px 20px;
+  box-shadow:0 0 18px rgba(0,229,255,.08);
+  backdrop-filter:blur(10px);
+}
+.info-mini-card h3{
+  color:var(--accent);
+  font-size:1rem;
+  margin-bottom:8px;
+}
+.info-mini-card p{
+  color:var(--muted);
+  font-size:.86rem;
+  line-height:1.65;
+}
+.info-list{
+  display:grid;
+  gap:10px;
+}
+.info-row{
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+  color:var(--muted);
+  font-size:.84rem;
+  line-height:1.55;
+}
+.info-dot{
+  color:var(--accent2);
+  font-family:"Space Mono",monospace;
+  font-weight:700;
+}
+@media(max-width:1100px){
+  .home-info-panel{
+    position:relative;
+    right:auto;
+    top:auto;
+    transform:none;
+    width:100%;
+    max-width:680px;
+    margin-top:30px;
+  }
+}
+
+</style>
+</head>
+<body>
+<nav><div class="logo">ROUTING AGV SMART FACTORY</div><div class="links">
+<button class="btn active" data-target="home">HOME</button>
+<button class="btn" data-target="studi">STUDI</button>
+<button class="btn" data-target="konsep">KONSEP</button>
+<button class="btn" data-target="graf">GRAF</button>
+<button class="btn" data-target="simulasi">SIMULASI</button>
+<button class="btn" data-target="kode">KODE</button>
+<button class="btn" data-target="hasil">HASIL</button></div></nav>
+
+<section id="home" class="active"><div class="gridbg"></div><div class="tag">MAKALAH TEORI GRAF SMART FACTORY</div><h1>Routing Otomatis <span>AGV</span><br>pada Smart Factory</h1><p class="sub">Simulasi pemilihan rute Automated Guided Vehicle dari Gudang menuju Mesin Produksi menggunakan konsep graf, shortest path, dynamic graph, dan visualisasi interaktif berbasis web.</p><div class="stats"><div class="stat"><span class="num">4</span><span class="lab">NODE</span></div><div class="stat"><span class="num">5</span><span class="lab">EDGE</span></div><div class="stat"><span class="num">4m</span><span class="lab">RUTE UTAMA</span></div><div class="stat"><span class="num">5m</span><span class="lab">RUTE ALTERNATIF</span></div></div>
+  <div class="home-info-panel">
+    <div class="info-mini-card">
+      <h3>Tujuan Simulasi</h3>
+      <p>Simulasi ini digunakan untuk menunjukkan bagaimana AGV memilih jalur tercepat dari Gudang menuju Mesin Produksi berdasarkan bobot lintasan.</p>
+    </div>
+    <div class="info-mini-card">
+      <h3>Alur Kerja Sistem</h3>
+      <div class="info-list">
+        <div class="info-row"><span class="info-dot">01</span><span>Sistem membaca titik awal, titik tujuan, dan kondisi jalur yang tersedia.</span></div>
+        <div class="info-row"><span class="info-dot">02</span><span>Graf dibentuk dari node dan edge, lalu sistem menghitung shortest path.</span></div>
+        <div class="info-row"><span class="info-dot">03</span><span>Jika jalur utama tertutup, sistem melakukan perhitungan ulang dan memilih rute alternatif.</span></div>
+      </div>
+    </div>
+    <div class="info-mini-card">
+      <h3>Hasil Utama</h3>
+      <p>Rute normal memiliki estimasi 4 menit, sedangkan rute alternatif memiliki estimasi 5 menit ketika jalur utama tidak dapat dilewati.</p>
+    </div>
+  </div>
+</section>
+
+<section id="studi"><div class="sec">01 - STUDI KASUS</div><h2>Distribusi Material dengan <em>AGV</em></h2><p class="lead">Studi kasus ini menggambarkan pabrik modern yang memanfaatkan AGV untuk mendistribusikan material dari Gudang menuju Mesin Produksi. Area yang digunakan dalam simulasi meliputi Gudang, Persimpangan, Jalur Alternatif, dan Mesin Produksi.</p><div class="flow"><div class="box">Gudang<br><small>Titik awal</small></div><div class="arrow">-></div><div class="box hl">Persimpangan<br><small>Rute utama</small></div><div class="arrow">-></div><div class="box">Mesin Produksi<br><small>Tujuan</small></div></div><div class="grid2"><div class="card"><div class="icon">🟢</div><h3>Kondisi Normal</h3><p>Jika jalur utama terbuka, AGV bergerak melalui Gudang ke Persimpangan lalu ke Mesin Produksi dengan estimasi waktu 4 menit.</p></div><div class="card"><div class="icon">🟠</div><h3>Jalur Tertutup</h3><p>Jika jalur Persimpangan ke Mesin Produksi tidak dapat dilewati, sistem menghitung ulang dan memilih Jalur Alternatif.</p></div></div></section>
+
+<section id="konsep"><div class="sec">02 - KONSEP DASAR</div><h2>Graf, Shortest Path, dan <em>Dynamic Graph</em></h2><div class="grid2"><div class="card"><div class="icon">📍</div><h3>Node</h3><p>Node merepresentasikan lokasi pabrik: Gudang, Persimpangan, Jalur Alternatif, dan Mesin Produksi.</p></div><div class="card"><div class="icon">〰️</div><h3>Edge</h3><p>Edge adalah lintasan AGV yang menghubungkan antar-node dan memiliki bobot estimasi waktu tempuh.</p></div><div class="card"><div class="icon">⚡</div><h3>Shortest Path</h3><p>Shortest path memilih rute dengan total bobot paling kecil, yaitu rute utama 4 menit.</p></div><div class="card"><div class="icon">🔁</div><h3>Dynamic Graph</h3><p>Dynamic graph terjadi ketika kondisi edge berubah, misalnya jalur utama tertutup sehingga sistem menghitung ulang rute.</p></div></div><h3 style="margin-top:32px;color:var(--text)">Representasi Node dan Edge</h3><div class="table" style="margin-top:14px"><table><thead><tr><th>Jenis</th><th>Representasi</th><th>Keterangan</th><th>Bobot</th></tr></thead><tbody><tr><td>Node</td><td>Gudang</td><td>Titik awal AGV mengambil material</td><td>-</td></tr><tr><td>Node</td><td>Persimpangan</td><td>Titik percabangan jalur utama</td><td>-</td></tr><tr><td>Node</td><td>Jalur Alternatif</td><td>Jalur cadangan saat rute utama terganggu</td><td>-</td></tr><tr><td>Node</td><td>Mesin Produksi</td><td>Tujuan pengiriman material</td><td>-</td></tr><tr><td>Edge</td><td>Gudang - Persimpangan</td><td>Lintasan utama awal</td><td>2 menit</td></tr><tr><td>Edge</td><td>Persimpangan - Mesin Produksi</td><td>Lintasan utama menuju tujuan</td><td>2 menit</td></tr><tr><td>Edge</td><td>Gudang - Jalur Alternatif</td><td>Lintasan alternatif awal</td><td>2 menit</td></tr><tr><td>Edge</td><td>Jalur Alternatif - Mesin Produksi</td><td>Lintasan alternatif menuju tujuan</td><td>3 menit</td></tr><tr><td>Edge</td><td>Persimpangan - Jalur Alternatif</td><td>Jalur penghubung tambahan</td><td>2 menit</td></tr></tbody></table></div></section>
+
+<section id="graf"><div class="sec">03 - VISUALISASI GRAF</div><h2>Simulasi Graf <em>Routing AGV</em></h2><p class="lead">Graf berikut menunjukkan hubungan antar-node dan perubahan rute saat jalur utama mengalami hambatan.</p>
+  <div class="graph-image-card">
+    <img src="agv-graf-routing.png" alt="Visualisasi Graf Routing AGV">
+    <div class="graph-caption">
+      Gambar graf routing AGV: garis hijau menunjukkan rute utama, garis oranye putus-putus menunjukkan rute alternatif, dan garis abu-abu menunjukkan jalur penghubung.
+    </div>
+  </div>
+<div class="graph"><div class="toolbar"><span class="badge">SIMULASI</span><button class="sim active" id="b0" onclick="simulate(0)">Rute Normal</button><button class="sim" id="b1" onclick="simulate(1)">Jalur Utama Tertutup</button><button class="sim" id="b2" onclick="simulate(2)">Collision Path</button></div><canvas id="canvas"></canvas><div id="info">Rute normal: Gudang -> Persimpangan -> Mesin Produksi | Total bobot: 4 menit</div></div><div class="grid3" style="margin-top:22px"><div class="card"><span class="badge green">RUTE UTAMA</span><p style="margin-top:10px">Gudang -> Persimpangan -> Mesin Produksi = 4 menit.</p></div><div class="card"><span class="badge orange">RUTE ALTERNATIF</span><p style="margin-top:10px">Gudang -> Jalur Alternatif -> Mesin Produksi = 5 menit.</p></div><div class="card"><span class="badge">PENGHUBUNG</span><p style="margin-top:10px">Persimpangan -> Jalur Alternatif digunakan sebagai jalur tambahan.</p></div></div></section>
+
+<section id="simulasi"><div class="sec">04 - SIMULASI DAN APLIKASI</div><h2>Packet Tracer dan <em>Streamlit</em></h2><p class="lead">Cisco Packet Tracer digunakan untuk menganalogikan router sebagai node, kabel sebagai edge, dan OSPF sebagai mekanisme routing otomatis. Aplikasi Streamlit digunakan untuk menampilkan rute, estimasi waktu, dan keputusan sistem secara interaktif.</p><div class="grid2">
+  <div class="card">
+    <div class="icon">🌐</div>
+    <h3>Cisco Packet Tracer</h3>
+    <p>Membuktikan jalur komunikasi dari Gudang ke Mesin Produksi melalui ping dan traceroute, termasuk saat jalur utama dimatikan.</p>
+  </div>
+  <a class="card-link" href="https://simulasi-routing-agv-adhit.streamlit.app/" target="_blank" rel="noopener noreferrer">
+  <div class="card">
+    <div class="icon">💻</div>
+    <h3>Aplikasi Streamlit</h3>
+    <p>Menampilkan pilihan titik awal, tujuan, kondisi jalur tertutup, hasil routing, estimasi waktu, dan visualisasi graf.</p>
+  </div>
+</a>
+</div><h3 style="margin-top:30px;color:var(--text)">Skenario Pengujian</h3><div class="table" style="margin-top:14px"><table><thead><tr><th>No</th><th>Kondisi</th><th>Rute Dipilih</th><th>Estimasi</th><th>Keputusan</th></tr></thead><tbody><tr><td>1</td><td>Jalur normal terbuka</td><td>Gudang -> Persimpangan -> Mesin Produksi</td><td>4 menit</td><td>Menggunakan rute utama</td></tr><tr><td>2</td><td>Jalur utama tertutup</td><td>Gudang -> Jalur Alternatif -> Mesin Produksi</td><td>5 menit</td><td>Perhitungan ulang rute</td></tr><tr><td>3</td><td>Potensi collision di Persimpangan</td><td>Gudang -> Jalur Alternatif -> Mesin Produksi</td><td>5 menit</td><td>Menghindari collision path</td></tr></tbody></table></div></section>
+
+<section id="kode"><div class="sec">05 - IMPLEMENTASI KODE</div><h2>Algoritma Routing dengan <em>NetworkX</em></h2><p class="lead" style="margin-bottom:18px">NetworkX digunakan untuk membentuk graf dan menghitung rute terpendek berdasarkan bobot.</p><pre><span class="kw">import</span> streamlit <span class="kw">as</span> st
+<span class="kw">import</span> networkx <span class="kw">as</span> nx
+
+G = nx.Graph()
+
+edges = [
+    (<span class="str">"Gudang"</span>, <span class="str">"Persimpangan"</span>, <span class="n">2</span>),
+    (<span class="str">"Persimpangan"</span>, <span class="str">"Mesin Produksi"</span>, <span class="n">2</span>),
+    (<span class="str">"Gudang"</span>, <span class="str">"Jalur Alternatif"</span>, <span class="n">2</span>),
+    (<span class="str">"Jalur Alternatif"</span>, <span class="str">"Mesin Produksi"</span>, <span class="n">3</span>),
+    (<span class="str">"Persimpangan"</span>, <span class="str">"Jalur Alternatif"</span>, <span class="n">2</span>),
+]
+
+G.add_weighted_edges_from(edges)
+
+<span class="cm"># Jika jalur utama ditutup</span>
+active_G = G.copy()
+active_G.remove_edge(<span class="str">"Persimpangan"</span>, <span class="str">"Mesin Produksi"</span>)
+
+path = nx.shortest_path(
+    active_G,
+    source=<span class="str">"Gudang"</span>,
+    target=<span class="str">"Mesin Produksi"</span>,
+    weight=<span class="str">"weight"</span>
+)</pre></section>
+
+<section id="hasil"><div class="sec">06 - HASIL DAN KESIMPULAN</div><h2>Analisis Hasil <em>Routing</em></h2><p class="lead">Hasil simulasi menunjukkan sistem dapat memilih rute utama ketika kondisi normal dan melakukan perhitungan ulang ketika jalur utama tertutup.</p><div class="res"><div class="rescard"><div class="resnum">4m</div><p class="lead">Rute utama: Gudang -> Persimpangan -> Mesin Produksi.</p></div><div class="rescard"><div class="resnum" style="color:var(--orange)">5m</div><p class="lead">Rute alternatif: Gudang -> Jalur Alternatif -> Mesin Produksi.</p></div><div class="rescard"><div class="resnum">100%</div><p class="lead">Koneksi berhasil pada jalur alternatif berdasarkan pengujian ping/traceroute.</p></div></div><div class="grid2" style="margin-top:24px"><div class="card"><h3>Kelebihan</h3><p>Sistem mampu memvisualisasikan node, edge, bobot, rute utama, rute alternatif, dan keputusan sistem secara interaktif.</p></div><div class="card"><h3>Keterbatasan</h3><p>Sistem masih berupa simulasi konseptual. Bobot masih manual dan belum memakai sensor real-time maupun kontrol AGV fisik.</p></div></div></section>
+
+<script>
+function show(id, btn){
+  document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+  const target = document.getElementById(id);
+  if (target) target.classList.add('active');
+  if (btn) btn.classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+  if (id === 'graf') setTimeout(initGraph, 40);
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.btn[data-target]').forEach(btn => {
+    btn.addEventListener('click', () => show(btn.dataset.target, btn));
+  });
+});
+let mode=0,particles=[],af=null;
+const nodes={g:{label:'Gudang',icon:'🏭',c:'#00e5ff'},p:{label:'Persimpangan',icon:'🔀',c:'#39ff6a'},m:{label:'Mesin Produksi',icon:'⚙️',c:'#00e5ff'},a:{label:'Jalur Alternatif',icon:'🛣️',c:'#ff8a00'}};
+const edges=[['g','p','2','main','gp'],['p','m','2','main','pm'],['g','a','2','alt','ga'],['a','m','3','alt','am'],['p','a','2','conn','pa']];
+const states=[{active:['gp','pm'],closed:[],info:'Rute normal: Gudang -> Persimpangan -> Mesin Produksi | Total bobot: 4 menit',on:['g','p','m']},{active:['ga','am'],closed:['pm'],info:'Jalur utama tertutup: sistem memilih Gudang -> Jalur Alternatif -> Mesin Produksi | Total bobot: 5 menit',on:['g','a','m']},{active:['ga','am'],closed:[],info:'Collision path di Persimpangan: AGV dialihkan melalui Jalur Alternatif untuk menghindari konflik jalur',on:['g','a','m']}];
+function pos(W,H){return{g:{x:W*.18,y:H*.34},p:{x:W*.5,y:H*.24},m:{x:W*.82,y:H*.34},a:{x:W*.5,y:H*.76}}}
+function initGraph(){const c=document.getElementById('canvas');if(!c)return;const W=c.parentElement.clientWidth,H=Math.max(420,Math.min(560,W*.56));c.width=W;c.height=H;c.style.height=H+'px';if(af)cancelAnimationFrame(af);draw(c)}
+function draw(c){const ctx=c.getContext('2d'),W=c.width,H=c.height,P=pos(W,H),R=Math.max(42,W*.045),S=states[mode];ctx.clearRect(0,0,W,H);ctx.strokeStyle='rgba(0,229,255,.035)';for(let x=0;x<W;x+=44){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}for(let y=0;y<H;y+=44){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}ctx.fillStyle='#eaf6ff';ctx.font=`bold ${Math.max(18,W*.025)}px Sora`;ctx.textAlign='center';ctx.fillText('Visualisasi Graf Routing AGV',W/2,H*.08);if(Math.random()<.25){let A=edges.filter(e=>S.active.includes(e[4]));let e=A[Math.floor(Math.random()*A.length)],f=P[e[0]],t=P[e[1]];particles.push({x:f.x,y:f.y,tx:t.x,ty:t.y,t:0,s:.012+Math.random()*.012})}particles=particles.filter(p=>{p.t+=p.s;return p.t<1});
+edges.forEach(e=>{const f=P[e[0]],t=P[e[1]],dx=t.x-f.x,dy=t.y-f.y,d=Math.hypot(dx,dy),ux=dx/d,uy=dy/d,sx=f.x+ux*R,sy=f.y+uy*R,ex=t.x-ux*R,ey=t.y-uy*R;let col='rgba(127,166,189,.45)',w=2,dash=[];if(S.active.includes(e[4])&&e[3]=='main'){col='#39ff6a';w=5}if(S.active.includes(e[4])&&e[3]=='alt'){col='#ff8a00';w=5;dash=[12,8]}if(S.closed.includes(e[4])){col='#ff4d6d';w=4;dash=[10,7]}ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(ex,ey);ctx.strokeStyle=col;ctx.lineWidth=w;ctx.setLineDash(dash);ctx.stroke();ctx.setLineDash([]);ctx.font=`bold ${Math.max(12,W*.013)}px Space Mono`;ctx.fillStyle=col;ctx.fillText(e[2],(sx+ex)/2+(-uy)*15,(sy+ey)/2+(ux)*15)});
+particles.forEach(p=>{let x=p.x+(p.tx-p.x)*p.t,y=p.y+(p.ty-p.y)*p.t,a=Math.sin(p.t*Math.PI);ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fillStyle=`rgba(57,255,106,${a})`;ctx.fill()});
+Object.entries(nodes).forEach(([id,n])=>{let p=P[id],on=S.on.includes(id);ctx.beginPath();ctx.arc(p.x,p.y,R,0,Math.PI*2);ctx.fillStyle=on?'rgba(57,255,106,.1)':'rgba(127,166,189,.08)';ctx.fill();ctx.strokeStyle=on?n.c:'rgba(127,166,189,.7)';ctx.lineWidth=on?2.8:1.6;ctx.stroke();ctx.font=`${R*.58}px serif`;ctx.textBaseline='middle';ctx.fillText(n.icon,p.x,p.y-R*.12);ctx.font=`bold ${Math.max(12,W*.013)}px Sora`;ctx.fillStyle='#eaf6ff';ctx.fillText(n.label,p.x,p.y+R+20)});
+af=requestAnimationFrame(()=>draw(c))}
+function simulate(m){mode=m;particles=[];document.querySelectorAll('.sim').forEach(b=>b.classList.remove('active'));document.getElementById('b'+m).classList.add('active');document.getElementById('info').textContent=states[m].info}
+window.addEventListener('resize',()=>{if(document.getElementById('graf').classList.contains('active'))initGraph()});
+</script>
+</body>
+</html>
